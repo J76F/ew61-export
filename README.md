@@ -1,3 +1,6 @@
+# Aanpassingen
+SQL output toegevoegd; maakt nog geen tabel aan; basis staat weergegeven in bestand songs_tabel.sql.
+
 # EasyWorship 6.1 Exporter
 
 * Author: James Inglis <hello@jamesinglis.no>
