@@ -327,6 +327,43 @@ function process_ew_single_block($text_block)
 }
 
 /**
+ * Add song toe database sql
+ */
+function save_text_SQL($song)
+{
+    global $custom_settings;
+	global $sql_settings;
+	
+	$contents = $song['text'];
+
+	if ($custom_settings['aggressive_text_encoding']) {
+		// Desperate attempt to get rid of any lingering unicode formatting issues! Forces text to ISO-8859-1 character set
+		$contents = iconv("ISO-8859-1", "UTF-8", iconv("UTF-8", "ISO-8859-1//IGNORE", $contents));
+	}
+
+
+	// Create connection
+	$connOutput = new mysqli($sql_settings['server'], $sql_settings['gebruikersnaam'], $sql_settings['wachtwoord'], $sql_settings['database']);
+	// Check connection
+	if ($connOutput->connect_error) {
+		die("Connection failed: " . $conn->connect_error);
+	}
+	$sql = "INSERT INTO " . $sql_settings['tabel'] . "
+				SET titel = '". $connOutput->real_escape_string($song['title']) . "',
+					auteur = '". $connOutput->real_escape_string($song['author']) . "',
+					copyright = '". $connOutput->real_escape_string($song['copyright']) . "',
+					ccli_no = '". $connOutput->real_escape_string($song['ccli_no']) . "',
+					lyrics = '". $connOutput->real_escape_string($contents) . "',
+					date = '". date('Y-m-d H:i:s') . "'";
+	if ($connOutput->query($sql) === TRUE) {
+		echo sprintf('Converting "%s" to SQL...', $song['title'], $song['id'],'<br>') . $break_char;
+	} else {
+		echo sprintf('ERROR_SQL Converting "%s" to SQL...', $song['title'], $song['id'],'<br>') . $break_char;
+	};
+	$connOutput->close();
+}
+
+/**
  * Worker function that constructs the file contents and saves it to the output directory
  *
  * @param $song Song array
